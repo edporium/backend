@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgres://yhktfavu:9l1GG3lrSxhs9x4c-KQy17pf4-jWqTrw@jelani.db.elephantsql.com/yhktfavu"
+}
+
+model User {
+  id       Int        @id @default(autoincrement())
+  username String     @unique @db.VarChar(255)
+  password String?
+  token    String     @unique @default(uuid())
+  setPasswordToken String? @unique @default(uuid())
+  createdAt DateTime @default(now())
+  accountActive Boolean
+  accountSuspendedReason String?
+  firstname String
+  lastname String
+  gender String?
+  phoneNumber String?
+  city String?
+  state String?
+  zip String?
+  street String?
+  vendorApplicationNumber String?
+  vendorBankingSetupToken String?
+  isParent Boolean
+  isWorker Boolean
+  isVendor Boolean
+  canPurchaseTuition Boolean
+  canPurchaseSupplies Boolean
+  canPurchaseTutor Boolean
+  canCreateParents Boolean
+  canCreateWorkers Boolean
+  canViewParents Boolean
+  canViewWorkers Boolean
+  canApprovePurchases Boolean
+  canApproveApplications Boolean
+  applicationIsApproved Boolean
+  applicationIsPending Boolean
+  suppliesRestrictions String?
+  vendorOrders Order[] @relation(name: "vendor")
+  parentOrders Order[] @relation(name: "parent")
+  students Student[]
+}
+
+
+model Student {
+  id Int @id @default(autoincrement())
+  firstname String
+  lastname String
+  parent User? @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  parentId Int?
+  orders Order[]
+}
+
+model Order {
+  id Int @id @default(autoincrement())
+  madeBy User? @relation(fields: [parentUserId], references: [id], name: "parent", onDelete: SetNull)
+  madeFor Student? @relation(fields: [studentId], references: [id], onDelete: SetNull)
+  madeWith Fund? @relation(fields: [fundId], references: [id], onDelete: SetNull)
+  madeTo User? @relation(fields: [vendorUserId], references: [id], name: "vendor", onDelete: SetNull)
+  studentId Int?
+  parentUserId Int?
+  vendorUserId Int?
+  fundId Int?
+  approved Boolean
+  rejected Boolean
+  amount Float
+  description String
+  reasonForRejection String
+
+
+}
+
+model Fund {
+  id Int @id @default(autoincrement())
+  name String
+  orders Order[]
+}
+
+
+
+
+
